@@ -5,16 +5,17 @@ import './index.css';
 function Square(props) {
     return (
         <button className="square" onClick={props.onClick}>
-            {props.value}
-        </button>
+            <font color={props.color}>{props.value}</font>
+        </button >
     );
 }
 
 class Board extends React.Component {
-    renderSquare(i) {
+    renderSquare(i, color) {
         return (
             <Square
                 value={this.props.squares[i]}
+                color={color}
                 onClick={() => this.props.onClick(i)}
                 key={i}
             />
@@ -26,7 +27,8 @@ class Board extends React.Component {
         for (let i = 0; i < 3; i++) {
             const squares = [];
             for (let j = i * 3; j < i * 3 + 3; j++) {
-                squares.push(this.renderSquare(j));
+                let color = this.props.winLine.includes(j) ? 'red' : 'black';
+                squares.push(this.renderSquare(j, color));
             }
             items.push(<div className="board-row" key={i} >{squares}</div>);
         }
@@ -109,8 +111,10 @@ class Game extends React.Component {
         }
 
         let status;
+        let winLine = [];
         if (winner) {
-            status = 'Winner: ' + winner;
+            status = 'Winner: ' + winner.team;
+            winLine = winner.line;
         } else {
             status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
         }
@@ -121,6 +125,7 @@ class Game extends React.Component {
                     <Board
                         squares={current.squares}
                         onClick={(i) => this.handleClick(i)}
+                        winLine={winLine}
                     />
                 </div>
                 <div className="game-info">
@@ -154,7 +159,10 @@ function calculateWinner(squares) {
     for (let i = 0; i < lines.length; i++) {
         const [a, b, c] = lines[i];
         if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-            return squares[a];
+            return {
+                team: squares[a],
+                line: lines[i],
+            };
         }
     }
     return null;
