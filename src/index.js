@@ -112,9 +112,12 @@ class Game extends React.Component {
 
         let status;
         let winLine = [];
+        let boardFull = !current.squares.includes(null);
         if (winner) {
             status = 'Winner: ' + winner.team;
             winLine = winner.line;
+        } else if (boardFull) {
+            status = 'Tie game';
         } else {
             status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
         }
