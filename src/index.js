@@ -47,6 +47,7 @@ class Game extends React.Component {
             }],
             stepNumber: 0,
             xIsNext: true,
+            ascending: false,
         };
     }
 
@@ -75,23 +76,37 @@ class Game extends React.Component {
         });
     }
 
+    toggleListView() {
+        this.setState({
+            ascending: !this.state.ascending,
+        });
+    }
+
     render() {
         const history = this.state.history;
         const current = history[this.state.stepNumber];
         const winner = calculateWinner(current.squares);
 
-        const moves = history.map((step, move) => {
+        let moves = history.map((step, move) => {
             const desc = move ?
                 `Go to move #${move} (${history[move].lastLocation.col}, ${history[move].lastLocation.row})` :
                 'Go to game start';
             return (
-                <li key={move}>
+                <li key={move} >
                     <button onClick={() => this.jumpTo(move)}>
-                        <span style={move === this.state.stepNumber ? { fontWeight: 'bold' } : { fontWeight: 'normal' }}>{desc}</span>
+                        <span style={move === this.state.stepNumber ? { fontWeight: 'bold' } : { fontWeight: 'normal' }}>
+                            {desc}
+                        </span>
                     </button>
                 </li >
             );
         });
+
+        let movesList = <ol>{moves}</ol>;
+        if (this.state.ascending) {
+            moves = moves.reverse();
+            movesList = <ol reversed>{moves}</ol>
+        }
 
         let status;
         if (winner) {
@@ -110,7 +125,8 @@ class Game extends React.Component {
                 </div>
                 <div className="game-info">
                     <div>{status}</div>
-                    <ol>{moves}</ol>
+                    <button onClick={() => this.toggleListView()}>Toggle List View</button>
+                    {movesList}
                 </div>
             </div>
         );
